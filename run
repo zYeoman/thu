@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# get script's real location
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ] ; do SOURCE="$(readlink "$SOURCE")"; done
+SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+# prepend it to PYTHONPATH
+export PYTHONPATH=${SCRIPT_DIR}:${PYTHON_PATH}
+
+python -m thu $*
