@@ -8,4 +8,7 @@ Available commands:
     thu net login
     thu net logout
 
-    thu wireless login
+    thu usereg iplist
+    thu usereg ipup x.x.x.x
+    thu usereg ipdown x.x.x.x
+    thu usereg ipdown 0/1/2
