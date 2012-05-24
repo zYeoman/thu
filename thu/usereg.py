@@ -122,4 +122,13 @@ def ipdown(ip):
     print(u.ipdown(ip))
     u.logout()
 
+def ipcheckup(ip):
+    u = Usereg(username, password)
+    for i in u.iplist():
+        if i.ip == ip:
+            print('already online')
+            break
+    else:
+        u.ipup(ip)
+
 main = iplist
