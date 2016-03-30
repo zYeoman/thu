@@ -7,29 +7,36 @@ from collections import namedtuple
 
 from .user import username, password
 
-NetUsage = namedtuple('NetUsage', 'id user traffic unknown timelen')
+NetUsage = namedtuple('NetUsage', 'ip user traffic timelen')
 
 def check():
-    req = Request('http://net.tsinghua.edu.cn/cgi-bin/do_login', b'action=check_online')
+    req = Request('http://net.tsinghua.edu.cn/do_login.php', b'action=check_online')
     resp = urlopen(req).read().decode()
-    info = NetUsage(*resp.split(','))
-    print(info)
+    print(resp)
+    if resp != 'not_online':
+        req = Request('http://net.tsinghua.edu.cn/rad_user_info.php', b'')
+        resp = urlopen(req).read().decode()
+        info = resp.split(',');
+        info = NetUsage(*[info[8], info[0], int(info[6])/1000000000, int(info[2])-int(info[1])])
+        print(info)
 
 def login():
     data = urlencode({
+	'action' : 'login',
         'username': username,
-        'password': md5(password).hexdigest(),
-        'drop': 0,
-        'type': 1,
-        'n': 100
+        'password': '{MD5_HEX}'+md5(password).hexdigest(),
+        'ac_id': 1 
         })
-    req = Request('http://net.tsinghua.edu.cn/cgi-bin/do_login', data.encode())
+    req = Request('http://net.tsinghua.edu.cn/do_login.php', data.encode())
     resp = urlopen(req).read().decode()
     print(resp)
     check()
 
 def logout():
-    req = Request('http://net.tsinghua.edu.cn/cgi-bin/do_logout', b'')
+    date = urlencode({
+        'action' : 'logout'
+        })
+    req = Request('http://net.tsinghua.edu.cn/do_login.php',date.encode())
     print(urlopen(req).read().decode())
 
 main = check

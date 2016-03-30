@@ -7,12 +7,11 @@ from urllib.parse import urlencode
 from hashlib import md5
 from collections import namedtuple
 from bs4 import BeautifulSoup
+from prettytable import PrettyTable
 
 from .user import username, password
 
 BASE_URL = 'https://usereg.tsinghua.edu.cn/'
-
-IpInfo = namedtuple('IpInfo', 'user ip usage_in usage_out balance credit client login_time avail_usage avail_time checksum')
 
 class Usereg:
     def __init__(self, username, password):
@@ -49,29 +48,11 @@ class Usereg:
     def iplist(self):
         url = BASE_URL + 'online_user_ipv4.php'
         content = self.opener.open(url).read().decode('gbk')
-        tree = BeautifulSoup(content)
+        tree = BeautifulSoup(content,'html.parser')
         rows = tree.body.table.find_all('table')[1].find_all('tr')
-        for row in rows[1:]:
-            values = [x.string.strip() for x in row.find_all('td') if x.string][1:]
-            values.append(row.input.attrs['onclick'].split('\'')[3])
-            yield IpInfo(*values)
-
-    def ipup(self, ip):
-        url = 'http://166.111.8.120/cgi-bin/do_login'
-        values = dict(
-                n = 100,
-                is_pad = 1,
-                type = 10,
-                username = self.username,
-                password = self.password,
-                user_ip = ip
-                )
-        req = self.opener.open(url, urlencode(values).encode('utf8'))
-        content = req.read().decode('utf8')
-        if content != '登录成功':
-            raise Exception(content)
-        else:
-            return 'ok'
+        for row in rows:
+            values = [x.string.strip() for x in row.find_all('td') if x.string]
+            yield values
 
     def ipdown(self, ip):
         url = BASE_URL + 'online_user_ipv4.php'
@@ -81,40 +62,28 @@ class Usereg:
         try:
             index = int(ip)
             ipr = list(self.iplist())[index]
-            ip = ipr.ip
-            checksum = ipr.checksum
+            ip = ipr[0]
         except Exception as e:
             pass
 
-        if not checksum:
-            for i in self.iplist():
-                if i.ip == ip:
-                    checksum = i.checksum
-
-        if not checksum:
-            raise Exception('ip not found')
-
         values = dict(
                 action = 'drop',
-                user_ip = ip,
-                checksum = checksum,
+                user_ip = ip
                 )
         req = self.opener.open(url, urlencode(values).encode('utf8'))
-        content = req.read().decode('utf8')
-        if content != 'ok':
-            raise Exception(content)
+        content = req.read().decode('gbk')
         return content
 
 
 def iplist():
     u = Usereg(username, password)
-    for i in u.iplist():
-        print(i)
-    u.logout()
-
-def ipup(ip):
-    u = Usereg(username, password)
-    print(u.ipup(ip))
+    for _,i in enumerate(u.iplist()):
+        i = i[0:4]+i[-6:]
+        if _ == 0:
+            t = PrettyTable(i)
+        else:
+            t.add_row(i)
+    print(t)
     u.logout()
 
 def ipdown(ip):
@@ -122,13 +91,5 @@ def ipdown(ip):
     print(u.ipdown(ip))
     u.logout()
 
-def ipcheckup(ip):
-    u = Usereg(username, password)
-    for i in u.iplist():
-        if i.ip == ip:
-            print('already online')
-            break
-    else:
-        u.ipup(ip)
 
 main = iplist

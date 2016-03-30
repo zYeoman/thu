@@ -8,4 +8,4 @@ SCRIPT_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 # prepend it to PYTHONPATH
 export PYTHONPATH=${SCRIPT_DIR}:${PYTHON_PATH}
 
-python -m thu $*
+python3 -m thu $*
