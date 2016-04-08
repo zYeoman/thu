@@ -1,7 +1,11 @@
 import os, os.path
 import pickle
 import getpass
-filename = os.path.join(os.environb[b'HOME'], b'.thu')
+
+if 'Home' in os.environ.keys():
+    filename = os.path.join(os.environ[b'HOME'], b'.thu')
+else:
+    filename = os.path.join(os.environ['USERPROFILE'], '_thu')
 
 def _load(path = filename):
     with open(path, 'rb') as f:
