@@ -1,4 +1,5 @@
-import os, os.path
+import os
+import os.path
 import pickle
 import getpass
 
@@ -7,14 +8,17 @@ if 'Home' in os.environ.keys():
 else:
     filename = os.path.join(os.environ['USERPROFILE'], '_thu')
 
-def _load(path = filename):
+
+def _load(path=filename):
     with open(path, 'rb') as f:
         return pickle.load(f)
 
-def _store(d, path = filename):
+
+def _store(d, path=filename):
     with open(path, 'wb') as f:
         pickle.dump(d, f)
     os.chmod(path, 0o600)
+
 
 def setuser():
     username = input('Username: ').encode()
@@ -24,8 +28,10 @@ def setuser():
     d['password'] = password
     _store(d)
 
+
 def show():
     print(_load())
+
 
 def main():
     print(_load()['username'].decode())

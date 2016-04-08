@@ -7,5 +7,5 @@ if len(sys.argv) < 2:
 module = sys.argv[1]
 command = sys.argv[2] if len(sys.argv) > 2 else "main"
 
-m = __import__(module, globals(), locals(), level = 1)
+m = __import__(module, globals(), locals(), level=1)
 getattr(m, command)(*sys.argv[3:])
