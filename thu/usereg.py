@@ -2,12 +2,14 @@
 #encoding: utf8
 
 from http.cookiejar import CookieJar
-from urllib.request import Request, HTTPCookieProcessor, build_opener
+from urllib.request import Request, HTTPCookieProcessor, build_opener, HTTPSHandler
 from urllib.parse import urlencode
 from hashlib import md5
 from collections import namedtuple
 from bs4 import BeautifulSoup
 from prettytable import PrettyTable
+
+import ssl
 
 from .user import username, password
 
@@ -16,7 +18,8 @@ BASE_URL = 'https://usereg.tsinghua.edu.cn/'
 class Usereg:
     def __init__(self, username, password):
         cj = CookieJar()
-        self.opener = build_opener(HTTPCookieProcessor(cj))
+        self.gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
+        self.opener = build_opener(HTTPCookieProcessor(cj), HTTPSHandler(debuglevel=1, context=self.gcontext))
         self.login(username, password)
 
     def login(self, username, password):
