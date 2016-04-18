@@ -3,10 +3,8 @@ import os.path
 import pickle
 import getpass
 
-if 'Home' in os.environ.keys():
-    filename = os.path.join(os.environ[b'HOME'], b'.thu')
-else:
-    filename = os.path.join(os.environ['USERPROFILE'], '_thu')
+home_dir = os.path.expanduser('~')
+filename = os.path.join(home_dir, '.thu')
 
 
 def _load(path=filename):
