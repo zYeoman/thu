@@ -1,1 +1,1 @@
-@py3.exe -m thu %*
+@python.exe -m thu %*
