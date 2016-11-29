@@ -2,13 +2,10 @@
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from hashlib import md5
-from collections import namedtuple
 
 from .user import username, password
 
 __all__ = ['check', 'login', 'logout', 'main']
-
-NetUsage = namedtuple('NetUsage', 'ip user traffic timelen')
 
 
 def check():
@@ -20,9 +17,12 @@ def check():
         req = Request('http://net.tsinghua.edu.cn/rad_user_info.php', b'')
         resp = urlopen(req).read().decode()
         info = resp.split(',')
-        info = NetUsage(*[info[8], info[0], int(info[6]) /
-                          1000000000, int(info[2]) - int(info[1])])
-        print(info)
+        traffic = int(info[6])/1000000000
+        timelen = int(info[2]) - int(info[1])
+        timelen_str = '{}:{}:{}'.format(timelen//3600,timelen//60%60,timelen%60)
+        info_str = 'NetUsage(ip={0[8]},user={0[0]},traffic={1:.2f}GB,timelen={2})'
+        info_str = info_str.format(info, traffic, timelen_str)
+        print(info_str)
 
 
 def login():
