@@ -22,7 +22,7 @@ class Usereg:
         cj = CookieJar()
         self.gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
         self.opener = build_opener(HTTPCookieProcessor(
-            cj), HTTPSHandler(debuglevel=1, context=self.gcontext))
+            cj), HTTPSHandler(context=self.gcontext))
         self.login(username, password)
 
     def login(self, username, password):
