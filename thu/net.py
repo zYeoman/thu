@@ -3,8 +3,6 @@ from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from hashlib import md5
 
-from .user import username, password
-
 __all__ = ['check', 'login', 'logout', 'main']
 
 
@@ -26,6 +24,8 @@ def check():
 
 
 def login():
+    from .user import username, password
+
     data = urlencode({
         'action': 'login',
         'username': username,
