@@ -28,10 +28,6 @@ def setuser():
 
 
 def show():
-    print(_load())
-
-
-def main():
     print(_load()['username'].decode())
 
 try:
@@ -43,3 +39,5 @@ except Exception as e:
 
 username = _data['username']
 password = _data['password']
+
+main = setuser
