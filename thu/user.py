@@ -8,6 +8,8 @@ filename = os.path.join(home_dir, '.thu')
 
 
 def _load(path=filename):
+    if not os.path.exists(path):
+        setuser()
     with open(path, 'rb') as f:
         return pickle.load(f)
 
@@ -30,12 +32,7 @@ def setuser():
 def show():
     print(_load()['username'].decode())
 
-try:
-    _data = _load()
-except Exception as e:
-    print(e)
-    setuser()
-    _data = _load()
+_data = _load()
 
 username = _data['username']
 password = _data['password']
