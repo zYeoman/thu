@@ -23,6 +23,7 @@ from prettytable import PrettyTable
 import ssl
 
 from .user import username, password
+from .user import setuser
 
 BASE_URL = 'https://usereg.tsinghua.edu.cn/'
 
@@ -49,6 +50,7 @@ class Usereg:
         resp = self.opener.open(req)
         content = resp.read().decode('gbk')
         if content != 'ok':
+            setuser()
             raise Exception(content)
 
     def logout(self):

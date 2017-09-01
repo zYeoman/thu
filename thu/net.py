@@ -36,6 +36,7 @@ def check():
 def login():
     """ Login to net.tsinghua.edu.cn """
     from .user import username, password
+    from .user import setuser
 
     data = urlencode({
         'action': 'login',
@@ -46,6 +47,8 @@ def login():
     req = Request('http://net.tsinghua.edu.cn/do_login.php', data.encode())
     resp = urlopen(req).read().decode()
     print(resp)
+    if resp.startswith('E'):
+        setuser()
     check()
 
 
