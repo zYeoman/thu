@@ -1,3 +1,12 @@
+"""User
+Load and store userinfo.
+
+Default save user info(username and password) at ~/.thu
+
+Author: Yeoman
+Date: 2017-09-02
+"""
+
 import os
 import os.path
 import pickle
@@ -14,23 +23,26 @@ def _load(path=filename):
         return pickle.load(f)
 
 
-def _store(d, path=filename):
+def _store(data, path=filename):
     with open(path, 'wb') as f:
-        pickle.dump(d, f)
+        pickle.dump(data, f)
     os.chmod(path, 0o600)
 
 
 def setuser():
+    """ Create new user """
     username = input('Username: ').encode()
     password = getpass.getpass().encode()
-    d = {}
-    d['username'] = username
-    d['password'] = password
-    _store(d)
+    data = {}
+    data['username'] = username
+    data['password'] = password
+    _store(data)
 
 
 def show():
+    """ Show username """
     print(_load()['username'].decode())
+
 
 _data = _load()
 

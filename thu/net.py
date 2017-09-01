@@ -1,4 +1,10 @@
+"""
+net.py
+Communicate with net.tsinghua.edu.cn.
 
+Author: Yeoman
+Date: 2017-09-02
+"""
 from urllib.request import urlopen, Request
 from urllib.parse import urlencode
 from hashlib import md5
@@ -7,6 +13,7 @@ __all__ = ['check', 'login', 'logout', 'main']
 
 
 def check():
+    """ Check if online. If so, show usage info. """
     req = Request('http://net.tsinghua.edu.cn/do_login.php',
                   b'action=check_online')
     resp = urlopen(req).read().decode()
@@ -15,15 +22,19 @@ def check():
         req = Request('http://net.tsinghua.edu.cn/rad_user_info.php', b'')
         resp = urlopen(req).read().decode()
         info = resp.split(',')
-        traffic = int(info[6])/1000000000
+        traffic = int(info[6]) / 1000000000
         timelen = int(info[2]) - int(info[1])
-        timelen_str = '{}:{}:{}'.format(timelen//3600,timelen//60%60,timelen%60)
-        info_str = 'NetUsage(ip={0[8]},user={0[0]},traffic={1:.2f}GB,timelen={2})'
-        info_str = info_str.format(info, traffic, timelen_str)
-        print(info_str)
+        timelen_str = '{}:{}:{}'.format(
+            timelen // 3600,
+            timelen // 60 % 60,
+            timelen % 60)
+        info_s = 'ip={0[8]},user={0[0]},traffic={1:.2f}GB,timelen={2}'
+        info_s = info_s.format(info, traffic, timelen_str)
+        print(info_s)
 
 
 def login():
+    """ Login to net.tsinghua.edu.cn """
     from .user import username, password
 
     data = urlencode({
@@ -39,10 +50,12 @@ def login():
 
 
 def logout():
+    """ Logout from net.tsinghua.edu.cn """
     date = urlencode({
         'action': 'logout'
     })
     req = Request('http://net.tsinghua.edu.cn/do_login.php', date.encode())
     print(urlopen(req).read().decode())
+
 
 main = check

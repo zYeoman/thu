@@ -1,5 +1,16 @@
 #!/usr/bin/python3
 # encoding: utf8
+"""Usereg
+Info of usereg.tsinghua.edu.cn
+
+  login: Login to usereg.tsinghua.edu.cn
+  logout: Logout from usereg.tsinghua.edu.cn
+  show: Show all online ip of usereg
+  ipdown: Send logout to ip.
+
+Author: Yeoman
+Date: 2017-09-02
+"""
 
 from http.cookiejar import CookieJar
 from urllib.request import Request
@@ -80,13 +91,13 @@ class Usereg:
     def ipup(self, ip):
         url = BASE_URL + 'ip_login.php'
         values = dict(
-                n = 100,
-                is_pad = 1,
-                type = 10,
-                action = 'do_login',
-                user_ip = ip,
-                drop = 0
-                )
+            n=100,
+            is_pad=1,
+            type=10,
+            action='do_login',
+            user_ip=ip,
+            drop=0
+        )
         req = self.opener.open(url, urlencode(values).encode('utf8'))
         content = req.read().decode('gbk')
         return 'ok'
@@ -109,9 +120,11 @@ def ipdown(ip):
     print(u.ipdown(ip))
     u.logout()
 
+
 def ipup(ip):
     u = Usereg(username, password)
     print(u.ipup(ip))
     u.logout()
+
 
 main = iplist
