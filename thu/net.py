@@ -3,10 +3,9 @@ net.py
 Communicate with net.tsinghua.edu.cn.
 
 Author: Yeoman
-Date: 2017-09-02
+Date: 2017-09-13
 """
-from urllib.request import urlopen, Request
-from urllib.parse import urlencode
+import requests
 from hashlib import md5
 
 __all__ = ['check', 'login', 'logout', 'main']
@@ -14,14 +13,12 @@ __all__ = ['check', 'login', 'logout', 'main']
 
 def check():
     """ Check if online. If so, show usage info. """
-    req = Request('http://net.tsinghua.edu.cn/do_login.php',
-                  b'action=check_online')
-    resp = urlopen(req).read().decode()
-    print(resp)
-    if resp != 'not_online':
-        req = Request('http://net.tsinghua.edu.cn/rad_user_info.php', b'')
-        resp = urlopen(req).read().decode()
-        info = resp.split(',')
+    req = requests.post('http://net.tsinghua.edu.cn/do_login.php',
+                        {'action': 'check_online'})
+    print(req.text)
+    if req.text != 'not_online':
+        req = requests.post('http://net.tsinghua.edu.cn/rad_user_info.php')
+        info = req.text.split(',')
         traffic = int(info[6]) / 1000000000
         timelen = int(info[2]) - int(info[1])
         timelen_str = '{}:{}:{}'.format(
@@ -38,27 +35,26 @@ def login():
     from .user import username, password
     from .user import setuser
 
-    data = urlencode({
+    data = {
         'action': 'login',
         'username': username,
         'password': '{MD5_HEX}' + md5(password).hexdigest(),
         'ac_id': 1
-    })
-    req = Request('http://net.tsinghua.edu.cn/do_login.php', data.encode())
-    resp = urlopen(req).read().decode()
-    print(resp)
-    if resp.startswith('E'):
+    }
+    req = requests.post('http://net.tsinghua.edu.cn/do_login.php', data)
+    print(req.text)
+    if req.text.startswith('E'):
         setuser()
     check()
 
 
 def logout():
     """ Logout from net.tsinghua.edu.cn """
-    date = urlencode({
+    date = {
         'action': 'logout'
-    })
-    req = Request('http://net.tsinghua.edu.cn/do_login.php', date.encode())
-    print(urlopen(req).read().decode())
+    }
+    req = requests.post('http://net.tsinghua.edu.cn/do_login.php', date)
+    print(req.text)
 
 
 main = check

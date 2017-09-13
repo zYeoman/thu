@@ -12,86 +12,101 @@ Author: Yeoman
 Date: 2017-09-02
 """
 
-from http.cookiejar import CookieJar
-from urllib.request import Request
-from urllib.request import HTTPCookieProcessor, build_opener, HTTPSHandler
-from urllib.parse import urlencode
+import requests
 from hashlib import md5
 from bs4 import BeautifulSoup
 from prettytable import PrettyTable
 
-import ssl
-
 from .user import username, password
 from .user import setuser
 
-BASE_URL = 'https://usereg.tsinghua.edu.cn/'
 
+class Usereg():
+    """Usereg for usereg.tsinghua.edu.cn"""
 
-class Usereg:
+    def __init__(self):
+        """init Usereg
+        :param user: User info
+        """
+        self._session = requests.session()
+        self._base = 'https://usereg.tsinghua.edu.cn/'
+        self._login_url = self._base + 'do.php'
 
-    def __init__(self, username, password):
-        cj = CookieJar()
-        self.gcontext = ssl.SSLContext(ssl.PROTOCOL_TLSv1)
-        self.opener = build_opener(HTTPCookieProcessor(
-            cj), HTTPSHandler(context=self.gcontext))
-        self.login(username, password)
-
-    def login(self, username, password):
-        self.username = username
-        self.password = md5(password).hexdigest()
-        url = BASE_URL + 'do.php'
-        data = dict(
-            action='login',
-            user_login_name=username,
-            user_password=self.password
-        )
-        req = Request(url, urlencode(data).encode('utf8'))
-        resp = self.opener.open(req)
-        content = resp.read().decode('gbk')
-        if content != 'ok':
-            setuser()
-            raise Exception(content)
+    def login(self):
+        """login usereg.tsinghua.edu.cn
+        :param user: User info
+        :return: response text
+        """
+        data = {
+            'action': 'login',
+            'user_login_name': username,
+            'user_password': md5(password).hexdigest(),
+        }
+        req = self._session.post(self._login_url, data)
+        return req.text
 
     def logout(self):
-        self.username = None
-        self.password = None
-        url = BASE_URL + 'do.php'
-        data = dict(action='logout')
-        req = Request(url, urlencode(data).encode('utf8'))
-        resp = self.opener.open(req)
-        content = resp.read().decode('gbk')
-        if content != 'ok':
-            raise Exception(content)
+        """logout usereg.tsinghua.edu.cn
+        :return: response text
+        """
+        data = {'action': 'logout'}
+        req = self._session.post(self._login_url, data)
+        return req.text
 
+    @property
     def iplist(self):
-        url = BASE_URL + 'online_user_ipv4.php'
-        content = self.opener.open(url).read().decode('gbk')
-        tree = BeautifulSoup(content, 'html.parser')
+        """iplist of online ip
+        :return: [] not login or iterator of ip info
+        """
+        url = self._base + 'online_user_ipv4.php'
+        req = self._session.get(url)
+        if req.text == '请登录先':
+            return []
+        tree = BeautifulSoup(req.content, 'html.parser')
         rows = tree.body.table.find_all('table')[1].find_all('tr')
         for row in rows:
             values = [x.string.strip() for x in row.find_all('td') if x.string]
             yield values
 
+    def show(self):
+        """show info of online ip
+        :return: None
+        """
+        output = None
+        for _, lst in enumerate(self.iplist):
+            lst = lst[0:4] + lst[-6:]
+            if _ == 0:
+                output = PrettyTable(lst)
+            else:
+                output.add_row(lst)
+        if output is None:
+            print('请先登录')
+        else:
+            print(output)
+
     def ipdown(self, ip):
-        url = BASE_URL + 'online_user_ipv4.php'
+        """send logout request to usereg.tsinghua.edu.cn
+        :param ip_str: str ip "127.0.0.1"
+        :param index:  index of iplist
+        :return: response text
+        """
+        url = self._base + 'online_user_ipv4.php'
         index = None
 
         if ip.isdigit():
             index = int(ip)
-            ipr = list(self.iplist())[index]
+            ipr = list(self.iplist)[index]
             ip = ipr[0]
 
-        values = dict(
-            action='drop',
-            user_ip=ip
-        )
-        req = self.opener.open(url, urlencode(values).encode('utf8'))
-        content = req.read().decode('gbk')
-        return content
+        values = {
+            'action': 'drop',
+            'user_ip': ip
+        }
+        req = self._session.post(url, values)
+        return req.text
 
     def ipup(self, ip):
-        url = BASE_URL + 'ip_login.php'
+        url = self._base + 'ip_login.php'
         values = dict(
             n=100,
             is_pad=1,
@@ -100,14 +115,14 @@ class Usereg:
             user_ip=ip,
             drop=0
         )
-        req = self.opener.open(url, urlencode(values).encode('utf8'))
-        content = req.read().decode('gbk')
+        self._session.post(url, values)
         return 'ok'
 
 
 def iplist():
-    u = Usereg(username, password)
-    for _, i in enumerate(u.iplist()):
+    u = Usereg()
+    u.login()
+    for _, i in enumerate(u.iplist):
         i = i[0:4] + i[-6:]
         if _ == 0:
             t = PrettyTable(i)
@@ -118,13 +133,15 @@ def iplist():
 
 
 def ipdown(ip):
-    u = Usereg(username, password)
+    u = Usereg()
+    u.login()
     print(u.ipdown(ip))
     u.logout()
 
 
 def ipup(ip):
-    u = Usereg(username, password)
+    u = Usereg()
+    u.login()
     print(u.ipup(ip))
     u.logout()
 
