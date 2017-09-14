@@ -17,7 +17,7 @@ from hashlib import md5
 from bs4 import BeautifulSoup
 from prettytable import PrettyTable
 
-from .user import username, password
+from .user import getuser
 from .user import setuser
 
 
@@ -37,10 +37,11 @@ class Usereg():
         :param user: User info
         :return: response text
         """
+        user = getuser()
         data = {
             'action': 'login',
-            'user_login_name': username,
-            'user_password': md5(password).hexdigest(),
+            'user_login_name': user['username'],
+            'user_password': md5(user['password']).hexdigest(),
         }
         req = self._session.post(self._login_url, data)
         return req.text

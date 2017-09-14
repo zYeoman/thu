@@ -32,19 +32,22 @@ def check():
 
 def login():
     """ Login to net.tsinghua.edu.cn """
-    from .user import username, password
+    from .user import getuser
     from .user import setuser
 
+    user = getuser()
     data = {
         'action': 'login',
-        'username': username,
-        'password': '{MD5_HEX}' + md5(password).hexdigest(),
+        'username': user['username'],
+        'password': '{MD5_HEX}' + md5(user['password']).hexdigest(),
         'ac_id': 1
     }
     req = requests.post('http://net.tsinghua.edu.cn/do_login.php', data)
     print(req.text)
     if req.text.startswith('E'):
         setuser()
+        login()
+        return
     check()
 
 

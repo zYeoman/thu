@@ -12,6 +12,8 @@ import os.path
 import pickle
 import getpass
 
+__all__ = ['getuser', 'setuser', 'show']
+
 home_dir = os.path.expanduser('~')
 filename = os.path.join(home_dir, '.thu')
 
@@ -39,14 +41,15 @@ def setuser():
     _store(data)
 
 
+def getuser():
+    """ Get user info """
+
+    return _load()
+
+
 def show():
     """ Show username """
     print(_load()['username'].decode())
 
 
-_data = _load()
-
-username = _data['username']
-password = _data['password']
-
-main = setuser
+main = show
