@@ -5,10 +5,13 @@ Communicate with net.tsinghua.edu.cn.
 Author: Yeoman
 Date: 2017-09-13
 """
-import requests
+import signal
+import sys
 from hashlib import md5
+from time import sleep
 
-__all__ = ['check', 'login', 'logout', 'main']
+import requests
+__all__ = ['check', 'login', 'logout', 'keep', 'main']
 
 
 def check():
@@ -30,7 +33,7 @@ def check():
         print(info_s)
 
 
-def login():
+def login(show=True):
     """ Login to net.tsinghua.edu.cn """
     from .user import getuser
     from .user import setuser
@@ -43,21 +46,40 @@ def login():
         'ac_id': 1
     }
     req = requests.post('http://net.tsinghua.edu.cn/do_login.php', data)
-    print(req.text)
     if req.text.startswith('E'):
+        print(req.text)
         setuser()
         login()
         return
-    check()
+    if show:
+        print(req.text)
+        check()
 
 
-def logout():
+def logout(show=True):
     """ Logout from net.tsinghua.edu.cn """
     date = {
         'action': 'logout'
     }
     req = requests.post('http://net.tsinghua.edu.cn/do_login.php', date)
-    print(req.text)
+    if show:
+        print(req.text)
+
+
+def keep():
+    """ Keep Online """
+
+    def signal_handler(_, __):
+        """Handle Ctrl+c signal """
+        logout()
+        sys.exit(0)
+
+    signal.signal(signal.SIGINT, signal_handler)
+
+    login()
+    while True:
+        sleep(10)
+        login(show=False)
 
 
 main = check

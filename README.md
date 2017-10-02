@@ -7,6 +7,7 @@ Available commands:
     thu net
     thu net login
     thu net logout
+    thu net keep
 
     thu usereg iplist
     thu usereg ipup x.x.x.x
