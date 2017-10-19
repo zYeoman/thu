@@ -46,7 +46,14 @@ def login(show=True):
         'ac_id': 1
     }
     req = requests.post('http://net.tsinghua.edu.cn/do_login.php', data)
+    if req.text.startswith('E2532'):
+        # 请求过于频繁
+        print(req.text)
+        sleep(10)
+        login()
+        return
     if req.text.startswith('E'):
+        # 其他错误，重设用户
         print(req.text)
         setuser()
         login()
