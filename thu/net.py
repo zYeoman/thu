@@ -52,6 +52,9 @@ def login(show=True):
         sleep(10)
         login()
         return
+    if req.text.startswith('E2616'):
+        print('No money!')
+        return
     if req.text.startswith('E'):
         # 其他错误，重设用户
         print(req.text)
