@@ -43,7 +43,10 @@ class Usereg():
             'user_password': md5(user['password']).hexdigest(),
         }
         req = self._session.post(self._login_url, data)
-        return req.text
+        if req.text == 'ok':
+            return req.text
+        else:
+            print(req.text)
 
     def logout(self):
         """logout usereg.tsinghua.edu.cn
