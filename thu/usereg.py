@@ -18,7 +18,6 @@ from bs4 import BeautifulSoup
 from prettytable import PrettyTable
 
 from .user import getuser
-from .user import setuser
 
 
 class Usereg():
@@ -123,13 +122,7 @@ class Usereg():
 def iplist():
     u = Usereg()
     u.login()
-    for _, i in enumerate(u.iplist):
-        i = i[0:4] + i[-6:]
-        if _ == 0:
-            t = PrettyTable(i)
-        else:
-            t.add_row(i)
-    print(t)
+    u.show()
     u.logout()
 
 
