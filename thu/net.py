@@ -5,6 +5,7 @@ Communicate with net.tsinghua.edu.cn.
 Author: Yeoman
 Date: 2017-09-13
 """
+import os
 import signal
 import sys
 from hashlib import md5
@@ -86,10 +87,16 @@ def keep():
 
     signal.signal(signal.SIGINT, signal_handler)
 
-    login()
     while True:
         sleep(10)
-        login(show=False)
+        if _chacknet():
+            login()
+
+
+def _chacknet():
+    """ Check if net works"""
+    exit_code = os.system('ping -c 1 www.baidu.com 1>/dev/null 2>&1')
+    return exit_code
 
 
 main = check
