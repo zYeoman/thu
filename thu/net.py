@@ -17,11 +17,11 @@ __all__ = ['check', 'login', 'logout', 'keep', 'main']
 
 def check():
     """ Check if online. If so, show usage info. """
-    req = requests.post('http://net.tsinghua.edu.cn/do_login.php',
+    req = requests.post('https://net.tsinghua.edu.cn/do_login.php',
                         {'action': 'check_online'})
     print(req.text)
     if req.text != 'not_online':
-        req = requests.post('http://net.tsinghua.edu.cn/rad_user_info.php')
+        req = requests.post('https://net.tsinghua.edu.cn/rad_user_info.php')
         info = req.text.split(',')
         traffic = int(info[6]) / 1000000000
         timelen = int(info[2]) - int(info[1])
@@ -46,7 +46,7 @@ def login(show=True):
         'password': '{MD5_HEX}' + md5(user['password']).hexdigest(),
         'ac_id': 1
     }
-    req = requests.post('http://net.tsinghua.edu.cn/do_login.php', data)
+    req = requests.post('https://net.tsinghua.edu.cn/do_login.php', data)
     if req.text.startswith('E2532'):
         # 请求过于频繁
         print(req.text)
@@ -72,7 +72,7 @@ def logout(show=True):
     date = {
         'action': 'logout'
     }
-    req = requests.post('http://net.tsinghua.edu.cn/do_login.php', date)
+    req = requests.post('https://net.tsinghua.edu.cn/do_login.php', date)
     if show:
         print(req.text)
 
