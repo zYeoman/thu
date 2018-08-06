@@ -89,11 +89,11 @@ def keep():
 
     while True:
         sleep(10)
-        if _chacknet():
+        if _checknet():
             login()
 
 
-def _chacknet():
+def _checknet():
     """ Check if net works"""
     exit_code = os.system('ping -c 1 www.baidu.com 1>/dev/null 2>&1')
     return exit_code
