@@ -69,10 +69,10 @@ def login(show=True):
 
 def logout(show=True):
     """ Logout from net.tsinghua.edu.cn """
-    date = {
+    data = {
         'action': 'logout'
     }
-    req = requests.post('https://net.tsinghua.edu.cn/do_login.php', date)
+    req = requests.post('https://net.tsinghua.edu.cn/do_login.php', data)
     if show:
         print(req.text)
 
